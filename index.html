@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Tableau de bord Immobilier — Objectif 1 M€</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{ --bg:#0e0f12; --card:#151820; --card-2:#1b1f2a; --text:#e7ecf3; --muted:#99a2b3; --accent:#7c9cff; --border:#242a36; --shadow:0 8px 24px rgba(0,0,0,.35); --radius:14px; --radius-sm:10px; --radius-xs:8px; }
+    @media (prefers-color-scheme: light){ :root{ --bg:#f6f8fc; --card:#ffffff; --card-2:#f0f3fa; --text:#0b0f17; --muted:#5a657a; --accent:#325eff; --border:#e6eaf2; --shadow:0 8px 24px rgba(16,24,40,.08);} }
+    *{box-sizing:border-box}
+    body{margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height:1.45}
+    .wrap{max-width:1100px; margin:0 auto; padding:calc(env(safe-area-inset-top,0) + 18px) 16px 96px}
+    header.app{position:sticky; top:0; z-index:5; background:linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,0)); backdrop-filter: blur(8px); padding:8px 16px 6px}
+    .title{display:flex; align-items:center; gap:10px} .title h1{font-size:1.15rem; margin:8px 0 6px}
+    .pill{font-size:.72rem; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:var(--card-2); color:var(--muted)}
+    .section-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:14px 0 8px}
+    .section-head h2{font-size:1.05rem; margin:0} .badge{font-size:.72rem; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:var(--card-2)}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:12px}
+    .kpis{display:grid; gap:10px; grid-template-columns:1fr 1fr} @media(min-width:640px){.kpis{grid-template-columns:repeat(4,1fr)}} @media(min-width:900px){.kpis{grid-template-columns:repeat(5,1fr)}}
+    .kpi .label{font-size:.8rem; color:var(--muted); display:flex; justify-content:space-between; gap:6px; margin-bottom:8px} .kpi .value{font-size:1.2rem; font-weight:700}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+    .bar{height:8px; background:var(--card-2); border:1px solid var(--border); border-radius:999px; overflow:hidden; margin-top:8px}
+    .bar i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#9f7cff)}
+    details.step{border:1px solid var(--border); background:var(--card); border-radius:var(--radius); overflow:hidden; margin:10px 0}
+    details.step[open]{outline:1px solid color-mix(in oklab, var(--accent) 30%, transparent)}
+    summary{list-style:none; display:flex; align-items:center; gap:12px; padding:14px; cursor:pointer; background:linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, transparent), var(--card))}
+    summary::-webkit-details-marker{display:none}
+    .idx{width:28px; height:28px; border-radius:8px; display:grid; place-items:center; background:var(--card-2); border:1px solid var(--border); color:var(--muted); font-weight:700}
+    .head-title{display:flex; flex-direction:column; gap:4px; min-width:0} .head-title b{font-size:.98rem} .head-sub{font-size:.82rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .state{font-size:.72rem; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:var(--card-2); margin-left:auto}
+    .step-body{padding:10px 14px 14px; border-top:1px dashed var(--border)} .cols{display:grid; gap:12px; grid-template-columns:1fr} @media(min-width:760px){.cols{grid-template-columns:1.1fr .9fr}}
+    .subcard{background:var(--card-2); border:1px dashed var(--border); border-radius:var(--radius-sm); padding:10px 12px} .subcard h4{margin:0 0 8px; font-size:.92rem}
+    .list{display:grid; gap:8px; margin:6px 0} .list label{display:flex; align-items:flex-start; gap:10px; font-size:.93rem; background:color-mix(in oklab, var(--card-2) 90%, transparent); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border)}
+    .list input[type=checkbox]{width:18px; height:18px; margin-top:2px; accent-color:var(--accent)}
+    .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:5; background:var(--card); border-top:1px solid var(--border); display:grid; grid-auto-flow:column; grid-auto-columns:1fr; padding:8px 6px calc(env(safe-area-inset-bottom,0) + 6px)}
+    .tabbar a{text-decoration:none; color:var(--muted); font-size:.78rem; display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 4px; border-radius:10px} .tabbar a.active{color:var(--accent); background:var(--card-2); border:1px solid var(--border)}
+    .toolbar{display:flex; gap:8px; flex-wrap:wrap} .btn{appearance:none; border:1px solid var(--border); background:var(--card-2); color:var(--text); padding:8px 10px; border-radius:10px; font-size:.88rem; cursor:pointer} .btn.primary{background:color-mix(in oklab, var(--accent) 20%, var(--card-2)); border-color:color-mix(in oklab, var(--accent) 40%, var(--border))}
+    input[type=file]{display:none} [contenteditable="true"]{outline:1px dashed transparent; border-radius:6px} [contenteditable="true"]:focus{outline:1px dashed var(--accent); background:color-mix(in oklab, var(--card) 90%, transparent)}
+    progress{ width:100%; height:10px; border-radius:999px; overflow:hidden; appearance:none; } progress::-webkit-progress-bar{ background:var(--card-2); border:1px solid var(--border); border-radius:999px} progress::-webkit-progress-value{ background:linear-gradient(90deg,var(--accent),#9f7cff)} progress::-moz-progress-bar{ background:linear-gradient(90deg,var(--accent),#9f7cff)}
+  </style>
+</head>
+<body>
+  <header class="app">
+    <div class="title">
+      <h1>Objectif 1 M€ — Dashboard & Checklist</h1>
+      <span class="pill">Mobile-first • Données persistées</span>
+    </div>
+  </header>
+
+  <main class="wrap" id="app" role="main">
+    <section>
+      <div class="section-head">
+        <h2>Persistance & données</h2>
+        <span class="badge" id="lastSaved">Jamais enregistré</span>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn primary" id="saveBtn">💾 Sauvegarder</button>
+          <button class="btn" id="exportBtn">⬇️ Exporter JSON</button>
+          <label class="btn" for="importFile">⬆️ Importer JSON</label>
+          <input type="file" id="importFile" accept="application/json" />
+          <button class="btn" id="resetBtn">🧹 Réinitialiser</button>
+        </div>
+        <p class="note" style="margin-top:8px">Les données sont stockées dans <b>localStorage</b> et peuvent être exportées/importées en <b>JSON</b> pour ne rien perdre.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Indicateurs clés</h2>
+        <span class="badge">Éditables</span>
+      </div>
+      <div class="kpis">
+        <div class="card kpi">
+          <div class="label"><span>Trésorerie dispo</span><span class="mono">€</span></div>
+          <div class="value mono" contenteditable="true" data-kpi="tresorerie">9000</div>
+          <div class="bar" aria-hidden="true"><i id="bar-cash" style="width:25%"></i></div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span>Taux d’endettement</span><span>objectif ≤ 35%</span></div>
+          <div class="value" contenteditable="true" data-kpi="endettement">35.0%</div>
+          <div class="bar" aria-hidden="true"><i id="bar-debt" style="width:35%"></i></div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span>Patrimoine net</span><span class="trend">/ 1 000 000</span></div>
+          <div class="value mono" contenteditable="true" data-kpi="patrimoine">120000</div>
+          <progress max="1000000" value="120000" id="prog-1m"></progress>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span>Cash-flow mensuel</span><span>après impôts</span></div>
+          <div class="value mono" contenteditable="true" data-kpi="cashflow">350</div>
+          <div class="bar" aria-hidden="true"><i id="bar-cf" style="width:35%"></i></div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span>Progression vers 1M€</span><span>objectif →</span></div>
+          <div class="value" id="kpi-progress">12%</div>
+          <div class="bar" aria-hidden="true"><i id="bar-1m" style="width:12%"></i></div>
+        </div>
+      </div>
+      <p class="note">Clique sur une valeur pour l’éditer. Les barres se recalculent automatiquement.</p>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Septembre 2025 — Check-list (30 jours)</h2><span class="badge">Hebdo</span></div>
+      <details class="step" open>
+        <summary><span class="idx">S1</span><div class="head-title"><b>1–7 sept</b><span class="head-sub">Remboursements, suspension PER, base dossier</span></div><span class="state">Point hebdo : endettement ≤ 35 %</span></summary>
+        <div class="step-body cols">
+          <div class="subcard">
+            <h4>À faire</h4>
+            <div class="list" data-week="s1">
+              <label><input type="checkbox" data-task="s1_rbt1600"> Rembourser prêt 1 600 € (140€/mois)</label>
+              <label><input type="checkbox" data-task="s1_rbt5000"> Rembourser voiture 5 000 € (140€/mois)</label>
+              <label><input type="checkbox" data-task="s1_stopperper"> Suspendre PER (300€/mois — temporaire)</label>
+              <label><input type="checkbox" data-task="s1_tbdupdate"> Mettre à jour le tableau de bord (taux d’endettement, trésorerie)</label>
+              <label><input type="checkbox" data-task="s1_docs"> Classer documents (3 fiches de paie, avis d’imposition, relevés)</label>
+            </div>
+          </div>
+          <div class="subcard">
+            <h4>Indicateur hebdo</h4>
+            <div class="grid-2">
+              <div><div class="kpi label">Endettement</div><div class="value" id="s1_endettement">≤ 35 %</div></div>
+              <div><div class="kpi label">État</div><div class="value" id="s1_etat">En cours</div></div>
+            </div>
+            <div style="margin-top:8px"><progress max="5" value="0" id="prog-s1"></progress></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="step">
+        <summary><span class="idx">S2</span><div class="head-title"><b>8–14 sept</b><span class="head-sub">Relevés, banques/courtier, contrat perso</span></div><span class="state">Point hebdo : dossier prêt</span></summary>
+        <div class="step-body cols">
+          <div class="subcard">
+            <h4>À faire</h4>
+            <div class="list" data-week="s2">
+              <label><input type="checkbox" data-task="s2_releves"> Relevés sans les 2 crédits remboursés</label>
+              <label><input type="checkbox" data-task="s2_banques"> Contacter 2 banques + 1 courtier</label>
+              <label><input type="checkbox" data-task="s2_contrat"> Rédiger contrat d’engagement (objectif 1 M€)</label>
+              <label><input type="checkbox" data-task="s2_rappels"> Paramétrer rappels mensuels/trimestriels</label>
+            </div>
+          </div>
+          <div class="subcard">
+            <h4>Indicateur hebdo</h4>
+            <div class="grid-2">
+              <div><div class="kpi label">Dossier prêt</div><div class="value" id="s2_etat">En cours</div></div>
+              <div><div class="kpi label">Avancement</div><div class="value" id="s2_pct">0 %</div></div>
+            </div>
+            <div style="margin-top:8px"><progress max="4" value="0" id="prog-s2"></progress></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="step">
+        <summary><span class="idx">S3</span><div class="head-title"><b>15–21 sept</b><span class="head-sub">Pipeline de biens + visites</span></div><span class="state">Point hebdo : ≥ 5 annonces filtrées</span></summary>
+        <div class="step-body cols">
+          <div class="subcard">
+            <h4>À faire</h4>
+            <div class="list" data-week="s3">
+              <label><input type="checkbox" data-task="s3_filtrer10"> Filtrer 10 biens (coloc/immeuble/passoire)</label>
+              <label><input type="checkbox" data-task="s3_5visites"> Programmer 5 visites</label>
+              <label><input type="checkbox" data-task="s3_tableur"> Construire fichier d’analyse (prix, frais, travaux, cash-flow)</label>
+            </div>
+          </div>
+          <div class="subcard">
+            <h4>Indicateur hebdo</h4>
+            <div class="grid-2">
+              <div><div class="kpi label">Pipeline</div><div class="value" id="s3_pipeline">0 / 10 analysés</div></div>
+              <div><div class="kpi label">Avancement</div><div class="value" id="s3_pct">0 %</div></div>
+            </div>
+            <div style="margin-top:8px"><progress max="3" value="0" id="prog-s3"></progress></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="step">
+        <summary><span class="idx">S4</span><div class="head-title"><b>22–30 sept</b><span class="head-sub">Visites, DPE, devis, offre prête</span></div><span class="state">Point hebdo : 1 offre prête début octobre</span></summary>
+        <div class="step-body cols">
+          <div class="subcard">
+            <h4>À faire</h4>
+            <div class="list" data-week="s4">
+              <label><input type="checkbox" data-task="s4_3visites"> Effectuer ≥ 3 visites + récupérer diagnostics</label>
+              <label><input type="checkbox" data-task="s4_2devis"> 2 devis travaux comparatifs sur bien cible</label>
+              <label><input type="checkbox" data-task="s4_simu"> Simulation rendement (loyers, cash-flow, DPE)</label>
+              <label><input type="checkbox" data-task="s4_offre"> Préparer offre négociée</label>
+            </div>
+          </div>
+          <div class="subcard">
+            <h4>Indicateur hebdo</h4>
+            <div class="grid-2">
+              <div><div class="kpi label">Offre prête</div><div class="value" id="s4_ready">Non</div></div>
+              <div><div class="kpi label">Avancement</div><div class="value" id="s4_pct">0 %</div></div>
+            </div>
+            <div style="margin-top:8px"><progress max="4" value="0" id="prog-s4"></progress></div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Points mensuels — Oct • Nov • Déc 2025</h2><span class="badge">Mensuel</span></div>
+      <details class="step">
+        <summary><span class="idx">M10</span><div class="head-title"><b>Octobre 2025</b><span class="head-sub">Offre déposée, compromis, financement</span></div><span class="state">À planifier</span></summary>
+        <div class="step-body cols">
+          <div class="subcard">
+            <h4>À faire</h4>
+            <div class="list" data-month="oct">
+              <label><input type="checkbox" data-task="m10_offre"> Déposer ≥ 1 offre</label>
+              <label><input type="checkbox" data-task="m10_nego"> Négociation acceptée</label>
+              <label><input type="checkbox" data-task="m10_compromis"> Compromis signé</label>
+              <label><input type="checkbox" data-task="m10_banque"> Banque prête à financer</label>
+            </div>
+          </div>
+          <div class="subcard">
+            <h4>Indicateur mensuel</h4>
+            <div class="grid-2"><div><div class="kpi label">État</div><div class="value" id="m10_etat">En cours</div></div><div><div class="kpi label">Avancement</div><div class="value" id="m10_pct">0 %</div></div></div>
+            <div style="margin-top:8px"><progress max="4" value="0" id="prog-m10"></progress></div>
+          </div>
+        </div>
+      </details>
+      <details class="step">
+        <summary><span class="idx">M11</span><div class="head-title"><b>Novembre 2025</b><span class="head-sub">Devis, plan DPE ≥ F, calendrier chantier</span></div><span class="state">À planifier</span></summary>
+        <div class="step-body cols">
+          <div class="subcard"><h4>À faire</h4><div class="list" data-month="nov">
+            <label><input type="checkbox" data-task="m11_devis"> Devis travaux validés</label>
+            <label><input type="checkbox" data-task="m11_planDPE"> Plan DPE ≥ F (idéalement D/E)</label>
+            <label><input type="checkbox" data-task="m11_mobilier"> Budget mobilier (coloc)</label>
+            <label><input type="checkbox" data-task="m11_calendrier"> Calendrier chantier</label>
+          </div></div>
+          <div class="subcard"><h4>Indicateur mensuel</h4><div class="grid-2"><div><div class="kpi label">État</div><div class="value" id="m11_etat">En cours</div></div><div><div class="kpi label">Avancement</div><div class="value" id="m11_pct">0 %</div></div></div><div style="margin-top:8px"><progress max="4" value="0" id="prog-m11"></progress></div></div>
+        </div>
+      </details>
+      <details class="step">
+        <summary><span class="idx">M12</span><div class="head-title"><b>Décembre 2025</b><span class="head-sub">Travaux lancés, suivi budget, trésorerie</span></div><span class="state">À planifier</span></summary>
+        <div class="step-body cols">
+          <div class="subcard"><h4>À faire</h4><div class="list" data-month="dec">
+            <label><input type="checkbox" data-task="m12_travaux"> Lancer les travaux</label>
+            <label><input type="checkbox" data-task="m12_budget"> Suivi dérives budgétaires</label>
+            <label><input type="checkbox" data-task="m12_treso"> Trésorerie maîtrisée</label>
+          </div></div>
+          <div class="subcard"><h4>Indicateur mensuel</h4><div class="grid-2"><div><div class="kpi label">État</div><div class="value" id="m12_etat">En cours</div></div><div><div class="kpi label">Avancement</div><div class="value" id="m12_pct">0 %</div></div></div><div style="margin-top:8px"><progress max="3" value="0" id="prog-m12"></progress></div></div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Bilan fin de trimestre — Décembre 2025</h2><span class="badge">Trimestriel</span></div>
+      <details class="step">
+        <summary><span class="idx">T4</span><div class="head-title"><b>31 déc 2025</b><span class="head-sub">Audit global & feuille de route T1 2026</span></div><span class="state">À réaliser</span></summary>
+        <div class="step-body cols">
+          <div class="subcard"><h4>À faire</h4><div class="list" data-quarter="t4">
+            <label><input type="checkbox" data-task="t4_endettement"> Endettement ≤ 35 % maintenu</label>
+            <label><input type="checkbox" data-task="t4_bien"> 1er bien sous compromis/acte</label>
+            <label><input type="checkbox" data-task="t4_travaux"> Travaux planifiés/lancés</label>
+            <label><input type="checkbox" data-task="t4_dashboard"> Dashboard à jour (trésorerie, patrimoine, %)</label>
+            <label><input type="checkbox" data-task="t4_roadmap"> Feuille de route T1 2026 définie</label>
+          </div></div>
+          <div class="subcard"><h4>Indicateur trimestre</h4>
+            <div class="grid-2">
+              <div><div class="kpi label">Statut</div><div class="value" id="t4_etat">En cours</div></div>
+              <div><div class="kpi label">Avancement</div><div class="value" id="t4_pct">0 %</div></div>
+            </div>
+            <div style="margin-top:8px"><progress max="5" value="0" id="prog-t4"></progress></div>
+          </div>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Navigation">
+    <a href="#app" class="active">🏠 Dashboard</a>
+    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'})">🔝 Haut</a>
+    <a href="#" id="quickSave">💾 Sauver</a>
+    <a href="#" id="quickExport">⬇️ Export</a>
+  </nav>
+
+  <script>
+    const DB_KEY = 'immoplan_db_v1';
+    const defaultDB = {
+      meta:{ lastSaved:null, currency:'EUR' },
+      kpis:{ tresorerie:9000, endettement:'35.0%', patrimoine:120000, cashflow:350 },
+      tasks:{
+        s1:{ s1_rbt1600:false, s1_rbt5000:false, s1_stopperper:false, s1_tbdupdate:false, s1_docs:false },
+        s2:{ s2_releves:false, s2_banques:false, s2_contrat:false, s2_rappels:false },
+        s3:{ s3_filtrer10:false, s3_5visites:false, s3_tableur:false },
+        s4:{ s4_3visites:false, s4_2devis:false, s4_simu:false, s4_offre:false },
+        m10:{ m10_offre:false, m10_nego:false, m10_compromis:false, m10_banque:false },
+        m11:{ m11_devis:false, m11_planDPE:false, m11_mobilier:false, m11_calendrier:false },
+        m12:{ m12_travaux:false, m12_budget:false, m12_treso:false },
+        t4:{ t4_endettement:false, t4_bien:false, t4_travaux:false, t4_dashboard:false, t4_roadmap:false }
+      }
+    };
+    function saveDB(db){ db.meta.lastSaved = new Date().toISOString(); localStorage.setItem(DB_KEY, JSON.stringify(db)); updateLastSaved(db.meta.lastSaved); }
+    function loadDB(){ try{ const raw = localStorage.getItem(DB_KEY); if(!raw){ saveDB(defaultDB); return JSON.parse(JSON.stringify(defaultDB)); } return JSON.parse(raw);}catch(e){ saveDB(defaultDB); return JSON.parse(JSON.stringify(defaultDB)); } }
+    let DB = loadDB();
+
+    function updateLastSaved(iso){ const el = document.getElementById('lastSaved'); if(!el) return; if(!iso){ el.textContent = 'Jamais enregistré'; return; } const d = new Date(iso); el.textContent = `Sauvé le ${d.toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}`; }
+    function parsePercent(text){ const m = String(text).replace(',', '.').match(/([0-9]+(?:\\.[0-9]+)?)/); return m? Math.min(100, Math.max(0, parseFloat(m[1]))) : 0; }
+    function updateKPIBars(){ const debtPct=parsePercent(DB.kpis.endettement); document.getElementById('bar-debt').style.width = debtPct+'%'; const cash=Number(DB.kpis.tresorerie)||0; document.getElementById('bar-cash').style.width = Math.min(100,(cash/36000)*100)+'%'; const cf=Number(DB.kpis.cashflow)||0; document.getElementById('bar-cf').style.width = Math.min(100,(cf/1000)*100)+'%'; const patrimoine=Number(DB.kpis.patrimoine)||0; document.getElementById('prog-1m').value = Math.max(0, Math.min(1000000, patrimoine)); const p=Math.min(100,(patrimoine/1000000)*100); document.getElementById('kpi-progress').textContent=p.toFixed(0)+'%'; document.getElementById('bar-1m').style.width=p+'%'; }
+
+    function bindEditableKPIs(){ document.querySelectorAll('[data-kpi]').forEach(el=>{ const key = el.dataset.kpi; el.addEventListener('blur', ()=>{ let val = el.textContent.trim(); if(['tresorerie','patrimoine','cashflow'].includes(key)){ val = Number(val.replace(/[^0-9.-]/g,''))||0; el.textContent = val; } DB.kpis[key] = val; updateKPIBars(); saveDB(DB); }); }); }
+    function bindChecklist(){ document.querySelectorAll('input[type=checkbox][data-task]').forEach(cb=>{ const id = cb.dataset.task; const group = id.split('_')[0]; cb.checked = !!(DB.tasks[group] && DB.tasks[group][id]); cb.addEventListener('change', ()=>{ if(!DB.tasks[group]) DB.tasks[group] = {}; DB.tasks[group][id] = cb.checked; saveDB(DB); refreshProgress(); }); }); }
+    function countGroup(group){ const g = DB.tasks[group] || {}; const keys = Object.keys(g); const total = keys.length || document.querySelectorAll(`[data-task^="${group}_"]`).length; const done = Object.values(g).filter(Boolean).length; return {done, total}; }
+
+    function refreshProgress(){ ['s1','s2','s3','s4'].forEach(g=>{ const {done,total}=countGroup(g); const prog=document.getElementById(`prog-${g}`); if(prog){ prog.max=total||1; prog.value=done; } const pctEl=document.getElementById(`${g}_pct`)||document.getElementById(`${g==='s1'?'s1_etat':g==='s4'?'s4_pct':g+'_pct'}`); if(pctEl){ pctEl.textContent = total? Math.round(done/total*100)+' %' : '0 %'; } if(g==='s4'){ const ready=document.getElementById('s4_ready'); if(ready){ ready.textContent = (DB.tasks.s4?.s4_offre? 'Oui' : 'Non'); } } }); ['m10','m11','m12'].forEach(g=>{ const {done,total}=countGroup(g); const prog=document.getElementById(`prog-${g}`); if(prog){ prog.max=total||1; prog.value=done; } const pctEl=document.getElementById(`${g}_pct`); if(pctEl){ pctEl.textContent = total? Math.round(done/total*100)+' %' : '0 %'; } }); const {done:td,total:tt}=countGroup('t4'); const pt=document.getElementById('prog-t4'); if(pt){ pt.max=tt||1; pt.value=td; } const t4pct=document.getElementById('t4_pct'); if(t4pct){ t4pct.textContent=tt? Math.round(td/tt*100)+' %':'0 %'; } }
+
+    function exportJSON(){ const data = JSON.stringify(DB, null, 2); const blob = new Blob([data], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; const dt = new Date().toISOString().slice(0,10); a.download = `immoplan_${dt}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+    function importJSON(file){ const reader = new FileReader(); reader.onload = ()=>{ try{ const obj = JSON.parse(reader.result); DB = obj; saveDB(DB); hydrateFromDB(); } catch(e){ alert('Fichier JSON invalide'); } }; reader.readAsText(file); }
+    function resetDB(){ if(confirm('Réinitialiser les données locales ?')){ DB = JSON.parse(JSON.stringify(defaultDB)); saveDB(DB); hydrateFromDB(); } }
+    function hydrateFromDB(){ document.querySelector('[data-kpi=tresorerie]').textContent = DB.kpis.tresorerie; document.querySelector('[data-kpi=endettement]').textContent = DB.kpis.endettement; document.querySelector('[data-kpi=patrimoine]').textContent = DB.kpis.patrimoine; document.querySelector('[data-kpi=cashflow]').textContent = DB.kpis.cashflow; updateKPIBars(); document.querySelectorAll('input[type=checkbox][data-task]').forEach(cb=>{ const id=cb.dataset.task; const group=id.split('_')[0]; cb.checked = !!(DB.tasks[group] && DB.tasks[group][id]); }); refreshProgress(); updateLastSaved(DB.meta.lastSaved); }
+
+    document.getElementById('saveBtn').addEventListener('click', ()=> saveDB(DB));
+    document.getElementById('exportBtn').addEventListener('click', exportJSON);
+    document.getElementById('quickExport').addEventListener('click', (e)=>{e.preventDefault(); exportJSON();});
+    document.getElementById('quickSave').addEventListener('click', (e)=>{e.preventDefault(); saveDB(DB);});
+    document.getElementById('importFile').addEventListener('change', (e)=>{ if(e.target.files[0]) importJSON(e.target.files[0]); });
+    document.getElementById('resetBtn').addEventListener('click', resetDB);
+
+    // Init
+    bindEditableKPIs(); bindChecklist(); hydrateFromDB();
+  </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "lastSaved": null,
+    "currency": "EUR"
+  },
+  "kpis": {
+    "tresorerie": 9000,
+    "endettement": "35.0%",
+    "patrimoine": 120000,
+    "cashflow": 350
+  },
+  "tasks": {
+    "s1": {
+      "s1_rbt1600": false,
+      "s1_rbt5000": false,
+      "s1_stopperper": false,
+      "s1_tbdupdate": false,
+      "s1_docs": false
+    },
+    "s2": {
+      "s2_releves": false,
+      "s2_banques": false,
+      "s2_contrat": false,
+      "s2_rappels": false
+    },
+    "s3": {
+      "s3_filtrer10": false,
+      "s3_5visites": false,
+      "s3_tableur": false
+    },
+    "s4": {
+      "s4_3visites": false,
+      "s4_2devis": false,
+      "s4_simu": false,
+      "s4_offre": false
+    },
+    "m10": {
+      "m10_offre": false,
+      "m10_nego": false,
+      "m10_compromis": false,
+      "m10_banque": false
+    },
+    "m11": {
+      "m11_devis": false,
+      "m11_planDPE": false,
+      "m11_mobilier": false,
+      "m11_calendrier": false
+    },
+    "m12": {
+      "m12_travaux": false,
+      "m12_budget": false,
+      "m12_treso": false
+    },
+    "t4": {
+      "t4_endettement": false,
+      "t4_bien": false,
+      "t4_travaux": false,
+      "t4_dashboard": false,
+      "t4_roadmap": false
+    }
+  }
+}
