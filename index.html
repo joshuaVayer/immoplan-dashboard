@@ -266,16 +266,20 @@
     </section>
   </main>
 
-  <nav class="tabbar" aria-label="Navigation">
-    <a href="#app" class="active">🏠 Dashboard</a>
-    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'})">🔝 Haut</a>
-    <a href="#" id="quickSave">💾 Sauver</a>
-    <a href="#" id="quickExport">⬇️ Export</a>
-  </nav>
+    <nav class="tabbar" aria-label="Navigation">
+      <a href="#app" class="active">🏠 Dashboard</a>
+      <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'})">🔝 Haut</a>
+      <a href="#" id="quickSave">💾 Sauver</a>
+      <a href="#" id="quickExport">⬇️ Export</a>
+      <a href="#" id="logoutBtn">🚪 Se déconnecter</a>
+    </nav>
 
-  <script>
-    const DB_KEY = 'immoplan_db_v1';
-    const defaultDB = {
+    <script>
+      const DB_KEY = 'immoplan_db_v1';
+      if (!localStorage.getItem('auth_ok')) {
+        window.location.href = 'login.html';
+      }
+      const defaultDB = {
       meta:{ lastSaved:null, currency:'EUR' },
       kpis:{ tresorerie:9000, endettement:'35.0%', patrimoine:120000, cashflow:350 },
       tasks:{
@@ -308,12 +312,13 @@
     function resetDB(){ if(confirm('Réinitialiser les données locales ?')){ DB = JSON.parse(JSON.stringify(defaultDB)); saveDB(DB); hydrateFromDB(); } }
     function hydrateFromDB(){ document.querySelector('[data-kpi=tresorerie]').textContent = DB.kpis.tresorerie; document.querySelector('[data-kpi=endettement]').textContent = DB.kpis.endettement; document.querySelector('[data-kpi=patrimoine]').textContent = DB.kpis.patrimoine; document.querySelector('[data-kpi=cashflow]').textContent = DB.kpis.cashflow; updateKPIBars(); document.querySelectorAll('input[type=checkbox][data-task]').forEach(cb=>{ const id=cb.dataset.task; const group=id.split('_')[0]; cb.checked = !!(DB.tasks[group] && DB.tasks[group][id]); }); refreshProgress(); updateLastSaved(DB.meta.lastSaved); }
 
-    document.getElementById('saveBtn').addEventListener('click', ()=> saveDB(DB));
-    document.getElementById('exportBtn').addEventListener('click', exportJSON);
-    document.getElementById('quickExport').addEventListener('click', (e)=>{e.preventDefault(); exportJSON();});
-    document.getElementById('quickSave').addEventListener('click', (e)=>{e.preventDefault(); saveDB(DB);});
-    document.getElementById('importFile').addEventListener('change', (e)=>{ if(e.target.files[0]) importJSON(e.target.files[0]); });
-    document.getElementById('resetBtn').addEventListener('click', resetDB);
+      document.getElementById('saveBtn').addEventListener('click', ()=> saveDB(DB));
+      document.getElementById('exportBtn').addEventListener('click', exportJSON);
+      document.getElementById('quickExport').addEventListener('click', (e)=>{e.preventDefault(); exportJSON();});
+      document.getElementById('quickSave').addEventListener('click', (e)=>{e.preventDefault(); saveDB(DB);});
+      document.getElementById('logoutBtn').addEventListener('click', (e)=>{e.preventDefault(); localStorage.removeItem('auth_ok'); window.location.href='login.html';});
+      document.getElementById('importFile').addEventListener('change', (e)=>{ if(e.target.files[0]) importJSON(e.target.files[0]); });
+      document.getElementById('resetBtn').addEventListener('click', resetDB);
 
     // Init
     bindEditableKPIs(); bindChecklist(); hydrateFromDB();
