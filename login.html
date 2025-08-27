@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion</title>
+</head>
+<body>
+  <form id="loginForm">
+    <label for="password">Mot de passe :</label>
+    <input type="password" id="password" required>
+    <button type="submit">Se connecter</button>
+  </form>
+  <script>
+    const PASSWORD = 'secret';
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const input = document.getElementById('password').value;
+      if (input === PASSWORD) {
+        localStorage.setItem('auth_ok', '1');
+        window.location.href = 'index.html';
+      } else {
+        alert('Mot de passe incorrect');
+      }
+    });
+  </script>
+</body>
+</html>
